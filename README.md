@@ -7,7 +7,7 @@ A django app that allows you to load a fixture in a particular migration state.
 
 If your django apps use fixtures then you already know that initial loading of fixtures has been deprecated since django version 1.7. If you want to load initial data you must use a data migration.
 
-Using a [https://docs.djangoproject.com/en/1.8/topics/migrations/#data-migrations]data migration is quite easy, you can add a RunPython migration that calls a function like:
+Using a [data migration](https://docs.djangoproject.com/en/1.8/topics/migrations/#data-migrations) is quite easy, you can add a RunPython migration that calls a function like:
 
     def load_data(apps, schema_editor):
         Book = apps.get_model('library', 'Book')

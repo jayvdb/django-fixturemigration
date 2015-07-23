@@ -4,7 +4,7 @@ from distutils.core import setup
 setup(
     name = 'django-fixturemigration',
     packages = ['fixturemigration'],
-    version = '0.1',
+    version = '0.2',
     description = 'An app to load fixtures inside a migration data step',
     author = 'Emilio A. Sánchez',
     author_email = 'emilio@commite.co',
