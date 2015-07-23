@@ -22,7 +22,7 @@ class Command(LoadDataCommand):
         """
         Loads fixtures files for a given label.
         """
-        for (fixture_file, fixture_dir, fixture_name in
+        for fixture_file, fixture_dir, fixture_name in (
                 self.find_fixtures(fixture_label)):
             _, ser_fmt, cmp_fmt = self.parse_name(
                 os.path.basename(fixture_file))
