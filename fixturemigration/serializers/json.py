@@ -11,6 +11,8 @@ from django.utils.encoding import force_text
 import json
 import sys
 
+from fixturemigration import is_django_1_7
+
 
 class Serializer(JSONSerializer):
 
@@ -41,7 +43,10 @@ def StatePythonDeserializer(object_list, **options):
         if 'pk' in d:
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
         m2m_data = {}
-        field_names = {f.name for f in Model._meta.get_fields()}
+        if is_django_1_7:
+            field_names = Model._meta.get_all_field_names()
+        else:
+            field_names = {f.name for f in Model._meta.get_fields()}
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
@@ -101,7 +106,11 @@ def _get_model(model_identifier, state):
     Helper to look up a model from an "app_label.model_name" string.
     """
     try:
-        return state.apps.get_model(model_identifier)
+        if is_django_1_7:
+            apps = state.render()
+        else:
+            apps = state.apps
+        return apps.get_model(model_identifier)
     except (LookupError, TypeError):
         raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
 

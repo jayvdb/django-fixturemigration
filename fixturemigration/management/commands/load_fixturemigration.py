@@ -9,6 +9,7 @@ from django.db import (
 )
 from django.utils.encoding import force_text
 
+from fixturemigration import is_django_1_7
 from fixturemigration.serializers.json import Deserializer
 
 
@@ -43,7 +44,11 @@ class Command(LoadDataCommand):
 
                 for obj in objects:
                     objects_in_fixture += 1
-                    if router.allow_migrate_model(
+                    if is_django_1_7:
+                        router_allow = router.allow_migrate
+                    else:
+                        router_allow = router.allow_migrate_model
+                    if router_allow(
                             self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
