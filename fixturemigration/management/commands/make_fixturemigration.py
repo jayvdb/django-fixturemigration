@@ -54,7 +54,6 @@ class Command(MigrationCommand):
         changes = autodetector.arrange_for_graph(
             changes=changes,
             graph=loader.graph,
-            migration_name=None
         )
         self.write_migration_files(changes)
         return
