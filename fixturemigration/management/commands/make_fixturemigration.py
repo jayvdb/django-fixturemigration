@@ -1,3 +1,5 @@
+from optparse import make_option
+
 from django.apps import apps
 from django.core.management.commands.makemigrations import (
     Command as MigrationCommand)
@@ -12,14 +14,11 @@ from fixturemigration.operations import LoadFixtureMigration
 
 class Command(MigrationCommand):
     help = "Creates new fixture migration in app."
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            'app_label',
-            help='Specify the app label to create migrations for.')
-        parser.add_argument(
-            '--fixture', action='store', dest='fixture_name',
-            help="Name of the fixture to load.")
+    option_list = MigrationCommand.option_list + (
+        make_option('-f', '--fixture', dest='fixture_name',
+            help="Name of the fixture to load"),
+        )
+    args = 'app_label'
 
     def handle(self, app_label, **options):
 
