@@ -6,6 +6,7 @@ from django.core.management import call_command
 class LoadFixtureMigration(Operation):
 
     def __init__(self, fixturemigration):
+        super(LoadFixtureMigration, self).__init__()
         self.fixturemigration = fixturemigration
 
     def reversible(self):

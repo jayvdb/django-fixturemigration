@@ -15,6 +15,10 @@ from fixturemigration.serializers.json import Deserializer
 
 class Command(LoadDataCommand):
 
+    def add_arguments(self, parser):
+        super(Command, self).add_arguments(parser)
+        parser.add_argument('--state')
+
     def handle(self, *fixture_labels, **options):
         self.state = options.get('state')
         super(Command, self).handle(*fixture_labels, **options)

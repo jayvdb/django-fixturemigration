@@ -14,13 +14,29 @@ from fixturemigration.operations import LoadFixtureMigration
 
 class Command(MigrationCommand):
     help = "Creates new fixture migration in app."
-    option_list = MigrationCommand.option_list + (
-        make_option('-f', '--fixture', dest='fixture_name',
-            help="Name of the fixture to load"),
-        )
-    args = 'app_label'
+    if hasattr(MigrationCommand, 'option_list'):
+        option_list = MigrationCommand.option_list + (
+            make_option('-f', '--fixture', dest='fixture_name',
+                help="Name of the fixture to load"),
+            )
+
+    #args = 'app_label'
+
+    def add_arguments(self, parser):
+        super(Command, self).add_arguments(parser)
+        parser.add_argument('-f', '--fixture', dest='fixture_name',
+            help="Name of the fixture to load")
 
     def handle(self, app_label, **options):
+        self.interactive = options['interactive']
+        self.dry_run = options['dry_run']
+        self.merge = options['merge']
+        self.empty = options['empty']
+        self.migration_name = options['name']
+        if self.migration_name and not self.migration_name.isidentifier():
+            raise CommandError('The migration name must be a valid Python identifier.')
+        self.include_header = options['include_header']
+        check_changes = options['check_changes']
 
         self.verbosity = options.get('verbosity')
         fixture_name = options.get('fixture_name')
