@@ -3,20 +3,15 @@ from __future__ import unicode_literals, absolute_import, unicode_literals
 from django.conf import settings
 from django.core.serializers import base
 from django.core.serializers.base import DeserializationError
-from django.core.serializers.json import Serializer as JSONSerializer
+from django.core.serializers.pyyaml import Deserializer, Serializer
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils import six
 from django.utils.encoding import force_text
 
-import json
+import yaml
 import sys
 
 from fixturemigration import is_django_1_7
-
-
-class Serializer(JSONSerializer):
-
-    pass
 
 
 def StatePythonDeserializer(object_list, **options):
@@ -63,7 +58,7 @@ def StatePythonDeserializer(object_list, **options):
             field = Model._meta.get_field(field_name)
 
             # Handle M2M relations
-            if field.rel and isinstance(field.rel, models.ManyToManyRel):
+            if hasattr(field, 'rel') and field.rel and isinstance(field.rel, models.ManyToManyRel):
                 if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
                         if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
@@ -75,7 +70,7 @@ def StatePythonDeserializer(object_list, **options):
                 m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
 
             # Handle FK fields
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+            elif hasattr(field, 'rel') and field.rel and isinstance(field.rel, models.ManyToOneRel):
                 if field_value is not None:
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                         if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
@@ -113,22 +108,3 @@ def _get_model(model_identifier, state):
         return apps.get_model(model_identifier)
     except (LookupError, TypeError):
         raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
-
-
-def Deserializer(stream_or_string, **options):
-    """
-    Deserialize a stream or string of JSON data.
-    """
-    if not isinstance(stream_or_string, (bytes, six.string_types)):
-        stream_or_string = stream_or_string.read()
-    if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode('utf-8')
-    try:
-        objects = json.loads(stream_or_string)
-        for obj in StatePythonDeserializer(objects, **options):
-            yield obj
-    except GeneratorExit:
-        raise
-    except Exception as e:
-        # Map to deserializer error
-        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
