@@ -5,9 +5,9 @@ from django.core.serializers import base
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.pyyaml import Deserializer, Serializer
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils import six
 from django.utils.encoding import force_text
 
+import six
 import yaml
 import sys
 
