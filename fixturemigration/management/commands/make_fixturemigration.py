@@ -20,7 +20,7 @@ class Command(MigrationCommand):
                 help="Name of the fixture to load"),
             )
 
-    #args = 'app_label'
+    args = 'app_label'
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
